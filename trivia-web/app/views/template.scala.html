@@ -1,0 +1,14 @@
+@(title: String, webJarAssets: WebJarAssets)(content: Html)
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>@title</title>
+        <link rel='stylesheet' href='@routes.WebJarAssets.at(webJarAssets.locate("css/bootstrap.min.css"))'>
+        <script type='text/javascript' src='@routes.WebJarAssets.at(webJarAssets.locate("jquery.min.js"))'></script>
+        <script type='text/javascript' src='@routes.WebJarAssets.at(webJarAssets.locate("bootstrap.min.js"))'></script>
+    </head>
+    <body>
+        <h1>Building Reactive: Operation Trivia</h1>
+        <div>@content</div>
+    </body>
+</html>

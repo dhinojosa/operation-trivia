@@ -1,0 +1,31 @@
+@(title: String, webJarAssets: WebJarAssets)
+@template(title = "Operation Trivia", webJarAssets) {
+    <script type='text/javascript' src='@routes.WebJarAssets.at(webJarAssets.locate("rx.min.js"))'></script>
+    <script>
+            var exampleSocket = new WebSocket("ws://localhost:9000/game/ws");
+            function sendAnswer(answer) {
+                exampleSocket.send(answer);
+                console.log(answer);
+            }
+
+            exampleSocket.onmessage = function (event) {
+                console.log(event.data);
+            }
+    </script>
+    <div id="main">
+        <div id="round_panel"></div>
+        <div id="message_panel"></div>
+        <div id="question_panel">
+            <div id="option_A"></div>
+            <div id="option_B"></div>
+            <div id="option_C"></div>
+            <div id="option_D"></div>
+            <div id="buttons">
+                <button id="button_A" onclick="sendAnswer('A');">A</button>
+                <button id="button_B" onclick="sendAnswer('B');">B</button>
+                <button id="button_C" onclick="sendAnswer('C');">C</button>
+                <button id="button_D" onclick="sendAnswer('D');">D</button>
+            </div>
+        </div>
+    </div>
+}

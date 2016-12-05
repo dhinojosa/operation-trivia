@@ -1,0 +1,19 @@
+name := """operation_trivia_play"""
+
+version := "1.0-SNAPSHOT"
+
+lazy val root = (project in file(".")).enablePlugins(PlayScala)
+
+scalaVersion := "2.11.7"
+
+libraryDependencies ++= Seq(
+  jdbc,
+  cache,
+  ws,
+  "com.typesafe.akka" %% "akka-remote" % "2.4.14",
+  "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1" % Test,
+  "org.webjars" % "webjars-play_2.11" % "2.5.0-4",
+  "org.webjars" % "bootstrap" % "3.3.7-1",
+  "org.webjars" % "rxjs" % "2.5.3"
+)
+
