@@ -26,9 +26,9 @@ class QuestionActor extends Actor {
   private def createQuestion(doc: Document): Option[Question] = {
     import collection.JavaConverters._
     for (
-      item <- doc.get("question").map(_.asString.getValue);
+      item         <- doc.get("question").map(_.asString.getValue);
       actualAnswer <- doc.get("actualAnswer").map(_.asNumber().intValue());
-      items <- doc.get("answers").map(_.asArray()
+      items        <- doc.get("answers").map(_.asArray()
         .getValues.asScala.map(_.asString().getValue))
         .map(_.toList)
     ) yield Question(item, items, actualAnswer)

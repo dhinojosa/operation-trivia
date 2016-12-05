@@ -2,7 +2,6 @@ package operation.trivia.entities.actors
 
 import akka.actor.ActorSystem
 import akka.testkit.TestActorRef
-import operation.trivia.actors.ScorekeeperActor
 import operation.trivia.entities.{Reset, Start}
 import org.scalatest.{BeforeAndAfter, FunSuite, Matchers}
 

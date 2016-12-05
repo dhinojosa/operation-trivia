@@ -1,7 +1,6 @@
 package operation.trivia
 
 import akka.actor.{ActorSystem, Props}
-import operation.trivia.actors.HostActor
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -14,7 +13,7 @@ import scala.language.postfixOps
 object Runner extends App {
   val system: ActorSystem = ActorSystem("ActorSystem")
   implicit val executionContext = system.dispatcher
-  private val scoreKeeperActorRef = system.actorOf(Props[HostActor], "hostActor")
+  private val scoreKeeperActorRef = system.actorOf(Props[SignonActor], "signonActor")
 
   println(s"Press RETURN to stop...")
   StdIn.readLine() // let it run until user presses return
