@@ -1,31 +1,127 @@
-@(title: String, webJarAssets: WebJarAssets)
-@template(title = "Operation Trivia", webJarAssets) {
-    <script type='text/javascript' src='@routes.WebJarAssets.at(webJarAssets.locate("rx.min.js"))'></script>
-    <script>
-            var exampleSocket = new WebSocket("ws://localhost:9000/game/ws");
-            function sendAnswer(answer) {
-                exampleSocket.send(answer);
-                console.log(answer);
-            }
+@(title: String, name: String, webJarAssets: WebJarAssets)
+    @template(title = "Operation Trivia", webJarAssets) {
+        <script type='text/javascript' src='@routes.WebJarAssets.at(webJarAssets.locate("rx.all.js"))'></script>
+        <script>
+                var hostSocket = new WebSocket("ws://localhost:9000/game/host/ws");
+                var scorekeeperSocket = new WebSocket("ws://localhost:9000/game/scorekeeper/ws");
 
-            exampleSocket.onmessage = function (event) {
-                console.log(event.data);
-            }
-    </script>
-    <div id="main">
-        <div id="round_panel"></div>
-        <div id="message_panel"></div>
-        <div id="question_panel">
-            <div id="option_A"></div>
-            <div id="option_B"></div>
-            <div id="option_C"></div>
-            <div id="option_D"></div>
-            <div id="buttons">
-                <button id="button_A" onclick="sendAnswer('A');">A</button>
-                <button id="button_B" onclick="sendAnswer('B');">B</button>
-                <button id="button_C" onclick="sendAnswer('C');">C</button>
-                <button id="button_D" onclick="sendAnswer('D');">D</button>
+                function sendAnswer(answer) {
+                    console.log("username is " + document.getElementById("login_name_only").textContent);
+                    scorekeeperSocket.send(answer);
+                    console.log(answer);
+                }
+
+                hostSocket.onmessage = function (event) {
+                    var data = event.data;
+                    console.log("Got Message:" + data);
+                };
+
+                hostSocket.onopen  = function() {
+                    hostSocket.send("init")
+                };
+
+
+                // an observer for when the socket is open
+                var openObserver = Rx.Observer.create(function(e) {
+                    console.info('socket open');
+
+                    // Now it is safe to send a message
+                    socket.onNext('test');
+                });
+
+                // an observer for when the socket is about to close
+                var closingObserver = Rx.Observer.create(function() {
+                    console.log('socket is about to close');
+                });
+
+                // create a web socket subject
+                socket = Rx.DOM.fromWebSocket(
+                        'ws://echo.websocket.org',
+                        null, // no protocol
+                        openObserver,
+                        closingObserver);
+
+                // subscribing creates the underlying socket and will emit a stream of incoming
+                // message events
+                socket.subscribe(
+                        function(e) {
+                            console.log('message: %s', e.data);
+                        },
+                        function(e) {
+                            // errors and "unclean" closes land here
+                            console.error('error: %s', e);
+                        },
+                        function() {
+                            // the socket has been closed
+                            console.info('socket closed');
+                        }
+                );
+
+
+//                var openObserver = Rx.Observer.create(function(e) {
+//                    console.info('socket open');
+//
+//                    // Now it is safe to send a message
+//                    socket.onNext('test');
+//                });
+//
+//                var closingObserver = Rx.Observer.create(function() {
+//                    console.log('socket is about to close');
+//                });
+//
+//                var socket = Rx.DOM.fromWebSocket(
+//                        "ws://localhost:9000/game/host/ws",
+//                        'what', // no protocol
+//                        openObserver,
+//                        closingObserver);
+//
+//                socket.subscribe(
+//                        function(e) {
+//                            console.log('message: %s', e.data);
+//                        },
+//                        function(e) {
+//                            // errors and "unclean" closes land here
+//                            console.error('error: %s', e);
+//                        },
+//                        function() {
+//                            // the socket has been closed
+//                            console.info('socket closed');
+//                        }
+//                );
+
+
+
+//                function load() {
+//                    source.subscribe(
+//                            function (x) {
+//                                console.log('onNext: ' + x)
+//                            }, function (e) {
+//                                console.log('onError: ' + e.message)
+//                            }, function () {
+//                                console.log('onCompleted')
+//                            }
+//                    );
+//                }
+//
+//                window.onload = load
+        </script>
+        <div id="main">
+            <a href="@routes.LoginController.logout()">Logout</a>
+            <span id="login_name_only" style="display: none">@name</span>
+            <div id="login_name">You are logged in as @name</div>
+            <div id="round_panel"></div>
+            <div id="message_panel"></div>
+            <div id="question_panel">
+                <div id="option_A"></div>
+                <div id="option_B"></div>
+                <div id="option_C"></div>
+                <div id="option_D"></div>
+                <div id="buttons">
+                    <button id="button_A" onclick="sendAnswer('A');">A</button>
+                    <button id="button_B" onclick="sendAnswer('B');">B</button>
+                    <button id="button_C" onclick="sendAnswer('C');">C</button>
+                    <button id="button_D" onclick="sendAnswer('D');">D</button>
+                </div>
             </div>
         </div>
-    </div>
-}
+    }

@@ -16,7 +16,8 @@ lazy val triviaWeb = (project in file("trivia-web"))
     "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1" % Test,
     "org.webjars" % "webjars-play_2.11" % "2.5.0-4",
     "org.webjars" % "bootstrap" % "3.3.7-1",
-    "org.webjars" % "rxjs" % "2.5.3"
+    "org.webjars" % "rxjs" % "2.5.3",
+    "org.webjars" % "RxJS-DOM" % "4.0.1"
   )
 )
 
@@ -103,7 +104,8 @@ lazy val triviaEntities = (project in file("trivia-entities")).settings(
   version := "0.1-SNAPSHOT",
   scalaVersion := "2.11.7",
   scalacOptions ++= Seq("-feature", "-deprecation"),
-  javacOptions ++= Seq("-Xlint:unchecked")
+  javacOptions ++= Seq("-Xlint:unchecked"),
+  libraryDependencies += "com.typesafe.akka" %% "akka-actor" % "2.4.13"
 )
 
 lazy val root =

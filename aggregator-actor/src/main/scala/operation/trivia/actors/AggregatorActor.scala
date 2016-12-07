@@ -9,7 +9,6 @@ class AggregatorActor extends Actor {
   private var currentCandidates:ArrayBuffer[(Player, Int, Long)] = ArrayBuffer.empty
 
   override def receive: Receive = {
-    case Reset => currentCandidates.clear()
-    case List =>
+    case s:String => println(s)
   }
 }

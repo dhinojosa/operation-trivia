@@ -14,6 +14,16 @@ GET        /assets/*file         controllers.Assets.versioned(path="/public", fi
 
 GET        /webjars/*file        controllers.WebJarAssets.at(file)
 
-GET        /game/ws              controllers.GameController.socket
+GET        /game/host/ws                controllers.GameController.hostSocket
+
+GET        /game/scorekeeper/ws         controllers.GameController.scorekeeperSocket
+
+GET        /game/signon/ws              controllers.GameController.signonSocket
 
 GET        /game                 controllers.GameController.index
+
+GET        /login                controllers.LoginController.loginIntro
+
+GET        /logout                controllers.LoginController.logout
+
+POST       /login                controllers.LoginController.login

@@ -1,31 +1,41 @@
 package operation.trivia.entities
 
+import akka.actor.ActorRef
+
 case class Round(winners:List[Player])
 
 case class Player(name:String)
 
 case class Question(item: String, possibleAnswers:List[String], actualAnswer: Int)
 
-object Start
+@SerialVersionUID(19L)
+object Start extends Serializable
 
-object Stop
+@SerialVersionUID(22L)
+object Stop extends Serializable
 
-object Reset
+@SerialVersionUID(90L)
+object Reset extends Serializable
 
 case class NewRound(x: Int)
 
-object Game
+@SerialVersionUID(401L)
+object Game extends Serializable
 
-case class Answer(round: Int, answer: Int, time: Long)
+case class Answer(player: Player, answer: Int)
 
 case class Signon(player:Player)
 
 case class Signoff(player:Player)
 
-object RequestQuestion
+@SerialVersionUID(222L)
+object RequestQuestion extends Serializable
 
 case class Winners(round:Int, winners:List[Answer])
 
-object RequestWinners
+@SerialVersionUID(505L)
+object Tick extends Serializable
 
-object Tick
+case class Register(a:ActorRef)
+
+case class Unregister(a:ActorRef)

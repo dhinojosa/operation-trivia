@@ -16,27 +16,24 @@ import scala.collection.mutable.ArrayBuffer
 class SignonActor extends Actor {
 
   private[SignonActor] val players: ArrayBuffer[Player] = ArrayBuffer[Player]()
-  private[SignonActor] val hostActorRef: ActorSelection = context.actorSelection("../hostActor")
   private[SignonActor] val log = Logging(context.system, this)
+  private[SignonActor] val hostActorSelection = context.system.actorSelection("akka.tcp://ActorSystem@127.0.0.1:2553/user/hostActor")
 
   override def receive: Receive = {
-    case s:String =>
-      log.info("Got message {}:", s)
-      sender ! "Got it, we cool!"
     case Signon(p:Player) =>
       log.debug("Signing on player: {}", p)
       players += p
-      if (players.size > 1) {
-        log.debug("More than 1 player signed on, starting game")
-        hostActorRef ! Start
+      if (players.nonEmpty) {
+        log.debug("Single player signed on, starting game")
+        hostActorSelection ! Start
       }
     case Signoff(p:Player) =>
       //No more players, stop the game
       log.debug("Signing off player: {}", p)
-      if (players.size <= 1) {
-        log.debug("Less than 1 player signed on, stopping game")
-        hostActorRef ! Stop
-      }
       players -= p
+      if (players.isEmpty) {
+        log.debug("No players signed on, stopping game")
+        hostActorSelection ! Stop
+      }
   }
 }
