@@ -1,127 +1,134 @@
 @(title: String, name: String, webJarAssets: WebJarAssets)
-    @template(title = "Operation Trivia", webJarAssets) {
-        <script type='text/javascript' src='@routes.WebJarAssets.at(webJarAssets.locate("rx.all.js"))'></script>
-        <script>
-                var hostSocket = new WebSocket("ws://localhost:9000/game/host/ws");
-                var scorekeeperSocket = new WebSocket("ws://localhost:9000/game/scorekeeper/ws");
+@template(title = "Operation Trivia Game!", webJarAssets) {
+    <script type='text/javascript' src='@routes.WebJarAssets.at(webJarAssets.locate("rx.all.js"))'></script>
+    <script type='text/javascript' src='@routes.WebJarAssets.at(webJarAssets.locate("rx.dom.min.js"))'></script>
 
-                function sendAnswer(answer) {
-                    console.log("username is " + document.getElementById("login_name_only").textContent);
-                    scorekeeperSocket.send(answer);
-                    console.log(answer);
-                }
+    <script>
+            const hostSocket = new WebSocket("ws://localhost:9000/game/host/ws");
+            const scoreKeeperSocket = new WebSocket("ws://localhost:9000/game/scorekeeper/ws");
 
-                hostSocket.onmessage = function (event) {
-                    var data = event.data;
-                    console.log("Got Message:" + data);
-                };
-
-                hostSocket.onopen  = function() {
-                    hostSocket.send("init")
-                };
+            const onOpenObservable = Rx.Observable.fromEvent(hostSocket, 'open');
+            onOpenObservable.subscribe(
+                    e => {
+                        console.log("Sending init to host" + e);
+                        hostSocket.send("init")
+                    },
+                    err => console.error("Error receiving message from actor:" + err),
+                    () => console.log("Messaging completed!")
+            );
 
 
-                // an observer for when the socket is open
-                var openObserver = Rx.Observer.create(function(e) {
-                    console.info('socket open');
+            const onMessageObservable = Rx.Observable.fromEvent(hostSocket, 'message');
+            onMessageObservable.subscribe(
+                    e => console.log("Received message from actor: " + e.data),
+                    err => console.error("Error receiving message from actor: " + err),
+                    () => console.log("Messaging completed!")
+            );
 
-                    // Now it is safe to send a message
-                    socket.onNext('test');
+            const jsonMessageObservable = onMessageObservable
+                    .map(e => e.data)
+                    .map(s => JSON.parse(s));
+
+            /*
+             * No messages in the database
+             */
+            jsonMessageObservable
+                    .filter(json => json['error'] !== undefined)
+                    .map(json => json['error'])
+                    .subscribe(msg => {
+                        console.log("Got no message error" + msg);
+                        $('#message_panel').html("<span class=\'error\'>No messages on the server</span>");
+                        $('#question').html('');
+                        $('#answers').hide();
+                        $('#seconds_left').html('');
+                    });
+
+            const questionObservable = jsonMessageObservable
+                    .filter(json => json['question'] !== undefined)
+                    .map(json => json['question']);
+
+            questionObservable
+                    .map(json => json['item'])
+                    .subscribe(msg => {
+                        console.log("Got question" + msg);
+                        $('#message_panel').html('');
+                        $('#question').html("<span class=\'question\'>" + msg + "</span>");
+                        $('#answers').show();
+                    });
+
+            questionObservable
+                    .map(json => json['possibleAnswers'])
+                    .subscribe(jsonList => {
+                        console.log("Setting up answers");
+                        $('#option_A').find('> span').html(jsonList[0]);
+                        $('#option_B').find('> span').html(jsonList[1]);
+                        $('#option_C').find('> span').html(jsonList[2]);
+                        $('#option_D').find('> span').html(jsonList[3]);
+                    });
+
+            jsonMessageObservable
+                    .filter(json => json['secondsLeft'] !== undefined)
+                    .map(json => json['secondsLeft'])
+                    .subscribe(msg => {
+                        console.log("Got time" + msg);
+                        $('#message_panel').html('');
+                        $('#seconds_left').html(msg);
+                    });
+
+            // Score Keeper Events
+            const scoreKeeperOpenObservable = Rx.Observable.fromEvent(scoreKeeperSocket, 'open');
+            scoreKeeperOpenObservable.subscribe(
+                    e => {
+                        console.log("Sending init to scorekeeper host" + e);
+                        scoreKeeperSocket.send("init")
+                    },
+                    err => console.error("Error receiving message from actor:" + err),
+                    () => console.log("Messaging completed!")
+            );
+            const scoreKeeperOnMessageObservable = Rx.Observable.fromEvent(scoreKeeperSocket, 'message');
+            scoreKeeperOnMessageObservable.subscribe(
+                    e => console.log("Received message from scorekeeper actor: " + e.data),
+                    err => console.error("Error receiving message from scorekeeper actor: " + err),
+                    () => console.log("Scorekeeper Messaging completed!")
+            );
+
+            $(document).ready(function () {
+                $('#button_A').on('click', function (e) {
+                    const obj = {"name" : $('#login_name').val(), "answer" : 0};
+                    const jsonString = JSON.stringify(obj);
+                    console.log("Sending object: " + jsonString);
+                    scoreKeeperSocket.send(jsonString);
                 });
+            });
 
-                // an observer for when the socket is about to close
-                var closingObserver = Rx.Observer.create(function() {
-                    console.log('socket is about to close');
-                });
-
-                // create a web socket subject
-                socket = Rx.DOM.fromWebSocket(
-                        'ws://echo.websocket.org',
-                        null, // no protocol
-                        openObserver,
-                        closingObserver);
-
-                // subscribing creates the underlying socket and will emit a stream of incoming
-                // message events
-                socket.subscribe(
-                        function(e) {
-                            console.log('message: %s', e.data);
-                        },
-                        function(e) {
-                            // errors and "unclean" closes land here
-                            console.error('error: %s', e);
-                        },
-                        function() {
-                            // the socket has been closed
-                            console.info('socket closed');
-                        }
-                );
-
-
-//                var openObserver = Rx.Observer.create(function(e) {
-//                    console.info('socket open');
-//
-//                    // Now it is safe to send a message
-//                    socket.onNext('test');
-//                });
-//
-//                var closingObserver = Rx.Observer.create(function() {
-//                    console.log('socket is about to close');
-//                });
-//
-//                var socket = Rx.DOM.fromWebSocket(
-//                        "ws://localhost:9000/game/host/ws",
-//                        'what', // no protocol
-//                        openObserver,
-//                        closingObserver);
-//
-//                socket.subscribe(
-//                        function(e) {
-//                            console.log('message: %s', e.data);
-//                        },
-//                        function(e) {
-//                            // errors and "unclean" closes land here
-//                            console.error('error: %s', e);
-//                        },
-//                        function() {
-//                            // the socket has been closed
-//                            console.info('socket closed');
-//                        }
-//                );
-
-
-
-//                function load() {
-//                    source.subscribe(
-//                            function (x) {
-//                                console.log('onNext: ' + x)
-//                            }, function (e) {
-//                                console.log('onError: ' + e.message)
-//                            }, function () {
-//                                console.log('onCompleted')
-//                            }
-//                    );
-//                }
-//
-//                window.onload = load
-        </script>
-        <div id="main">
-            <a href="@routes.LoginController.logout()">Logout</a>
-            <span id="login_name_only" style="display: none">@name</span>
-            <div id="login_name">You are logged in as @name</div>
-            <div id="round_panel"></div>
-            <div id="message_panel"></div>
-            <div id="question_panel">
-                <div id="option_A"></div>
-                <div id="option_B"></div>
-                <div id="option_C"></div>
-                <div id="option_D"></div>
-                <div id="buttons">
-                    <button id="button_A" onclick="sendAnswer('A');">A</button>
-                    <button id="button_B" onclick="sendAnswer('B');">B</button>
-                    <button id="button_C" onclick="sendAnswer('C');">C</button>
-                    <button id="button_D" onclick="sendAnswer('D');">D</button>
+    </script>
+    <div id="main">
+        <a href="@routes.LoginController.logout()">Logout</a>
+        <input type="hidden" id="login_name" value="@name">
+        <div id="login_panel">@name</div>
+        <div id="round_panel"></div>
+        <div id="message_panel"></div>
+        <div id="seconds_left"></div>
+        <div id="question_panel">
+            <div id="question"></div>
+            <div id="answers">
+                <div id="option_A">
+                    <button id="button_A">A</button>
+                    <span></span>
+                </div>
+                <div id="option_B">
+                    <button id="button_B">B</button>
+                    <span></span>
+                </div>
+                <div id="option_C">
+                    <button id="button_C">C</button>
+                    <span></span>
+                </div>
+                <div id="option_D">
+                    <button id="button_D">D</button>
+                    <span></span>
                 </div>
             </div>
         </div>
-    }
+    </div>
+}

@@ -6,6 +6,24 @@
         <link rel='stylesheet' href='@routes.WebJarAssets.at(webJarAssets.locate("css/bootstrap.min.css"))'>
         <script type='text/javascript' src='@routes.WebJarAssets.at(webJarAssets.locate("jquery.min.js"))'></script>
         <script type='text/javascript' src='@routes.WebJarAssets.at(webJarAssets.locate("bootstrap.min.js"))'></script>
+        <script type="text/javascript">
+                window.document.onload = function(e){
+                    console.log("document.onload on template");
+                };
+
+                window.onload = function(e){
+                    console.log("window.onload on template");
+                };
+
+                $(window).ready(function () {
+                    console.log("window.ready on template")
+                });
+
+                $(document).ready(function() {
+                    console.log("document.ready on template")
+                })
+        </script>
+
     </head>
     <body>
         <h1>Building Reactive: Operation Trivia</h1>

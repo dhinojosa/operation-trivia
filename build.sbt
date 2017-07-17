@@ -79,6 +79,7 @@ lazy val questionActor = (project in file("question-actor"))
     "com.typesafe.akka" %% "akka-testkit" % "2.4.13",
     "com.typesafe.akka" %% "akka-remote" % "2.4.14",
     "org.scalatest" %% "scalatest" % "3.0.1",
+    //"org.mongodb.scala" % "mongo-scala-driver_2.11" % "2.1.0"
     "org.mongodb.scala" %% "mongo-scala-driver" % "1.2.1"
   )
 )

@@ -8,6 +8,8 @@ import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc._
+import play.api.Logger
+
 
 class LoginController @Inject()(val webJarAssets: WebJarAssets,
                                 val actorSystem: ActorSystem,

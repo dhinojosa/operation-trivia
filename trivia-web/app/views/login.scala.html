@@ -7,9 +7,7 @@
 }
 
 @template("Login to Continue", webJarAssets) {
-    @helper.form(action =
-                       routes.LoginController.login(),
-                       'id -> "login_form") {
+    @helper.form(action = routes.LoginController.login(), 'id -> "login_form") {
         <div>
         @helper.inputText(form("name"),
                 '_id -> "name",

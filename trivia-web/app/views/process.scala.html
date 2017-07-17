@@ -1,0 +1,34 @@
+@(title: String, name: String, webJarAssets: WebJarAssets)
+@template(title = "Operation Trivia Game!", webJarAssets) {
+    <script type='text/javascript' src='@routes.WebJarAssets.at(webJarAssets.locate("rx.all.js"))'></script>
+    <script type="text/javascript">
+
+            const scoreKeeperSocket = new WebSocket("ws://localhost:9000/game/scorekeeper/ws");
+
+            // Score Keeper Events
+            const scoreKeeperOpenObservable = Rx.Observable.fromEvent(scoreKeeperSocket, 'open');
+            scoreKeeperOpenObservable.subscribe(
+                    e => {
+                        console.log("Sending init to scorekeeper host");
+                        scoreKeeperSocket.send("init")
+                    },
+                    err => console.error("Error receiving message from actor:" + err),
+                    () => console.log("Messaging completed!")
+            );
+
+            const scoreKeeperOnMessageObservable = Rx.Observable.fromEvent(scoreKeeperSocket, 'message');
+            scoreKeeperOnMessageObservable.subscribe(
+                    e => console.log("Received message from scorekeeper actor: " + e.data),
+                    err => console.error("Error receiving message from scorekeeper actor: " + err),
+                    () => console.log("Scorekeeper Messaging completed!")
+            );
+    </script>
+    <div id="main">
+        <a href="@routes.LoginController.logout()">Logout</a>
+        <div id="errors">
+        </div>
+        <div>
+            <button id="foo" onclick="scoreKeeperSocket.send('butt')">Click here!</button>
+        </div>
+    </div>
+}

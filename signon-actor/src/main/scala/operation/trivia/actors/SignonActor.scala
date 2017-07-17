@@ -17,7 +17,8 @@ class SignonActor extends Actor {
 
   private[SignonActor] val players: ArrayBuffer[Player] = ArrayBuffer[Player]()
   private[SignonActor] val log = Logging(context.system, this)
-  private[SignonActor] val hostActorSelection = context.system.actorSelection("akka.tcp://ActorSystem@127.0.0.1:2553/user/hostActor")
+  private[SignonActor] val hostActorSelection =
+    context.system.actorSelection("akka.tcp://ActorSystem@127.0.0.1:2553/user/hostActor")
 
   override def receive: Receive = {
     case Signon(p:Player) =>

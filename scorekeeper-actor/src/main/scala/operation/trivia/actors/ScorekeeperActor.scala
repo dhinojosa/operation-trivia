@@ -12,7 +12,7 @@ class ScorekeeperActor extends Actor {
   var currentRound = 1
   val answers: mutable.Map[Player, (Int, Long)] = mutable.Map[Player, (Int, Long)]()
 
-  var correctAnswer = -1
+  var correctAnswer: Int = -1
 
   def sendToWebClients(a:Any): Unit = {
     webClients.foreach(ref => ref ! a)
@@ -32,20 +32,20 @@ class ScorekeeperActor extends Actor {
         .toList.sortBy((x: (Player, (Int, Long))) => x._2._2)
       sendToWebClients(currentRound -> winners)
     case Question(_, _, actualAnswer) =>
-      //We receive the question from the host and all we need is the
+      //We receive the question from the host
+      //and all we need is the
       //correct answer
       log.debug("Question Called")
       correctAnswer = actualAnswer
+    case Answer(player, answer) =>
+      log.debug("Received Answer")
+      answers += (player -> (answer, System.currentTimeMillis()))
     case Register(ar) =>
       log.debug("Register Called")
       webClients += ar
     case Unregister(ar) =>
       log.debug("Unregister Called")
       webClients -= ar
-    case Answer(player, answer) =>
-      log.debug("Received Answer")
-      answers += (player -> (answer, System.currentTimeMillis()))
-
 
   }
 }

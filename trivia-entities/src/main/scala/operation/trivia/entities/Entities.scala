@@ -6,6 +6,7 @@ case class Round(winners:List[Player])
 
 case class Player(name:String)
 
+@SerialVersionUID(510L)
 case class Question(item: String, possibleAnswers:List[String], actualAnswer: Int)
 
 @SerialVersionUID(19L)

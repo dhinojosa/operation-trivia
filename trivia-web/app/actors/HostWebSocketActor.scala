@@ -15,16 +15,21 @@ class HostWebSocketActor(out: ActorRef) extends Actor {
 
   def receive: PartialFunction[Any, Unit] = {
     case "init" =>
-      Logger.debug("Init connection")
+      Logger.debug("Init connection Host")
       actorSelection ! Register(self)
     case q: Question =>
-      Logger.debug("question delivered")
-      val json: JsValue = Json.toJson(Json.obj("item" -> q.item, "possibleAnswers" ->
-        q.possibleAnswers, "actualAnswer" -> q.actualAnswer))
+      Logger.debug("Question Delivered to Web!")
+      val json: JsValue = Json.toJson(
+        Json.obj("question" -> Json.obj("item" -> q.item, "possibleAnswers" ->
+          q.possibleAnswers, "actualAnswer" -> q.actualAnswer))
+      )
       out ! Json.stringify(json)
     case y: Int =>
       Logger.debug("Got a message: {}" + y)
       out ! Json.stringify(Json.obj("secondsLeft" -> y))
+    case None =>
+      Logger.debug("There are no questions")
+      out ! Json.stringify(Json.obj("error" -> "no questions"))
     case m =>
       Logger.debug("Didn't find anything for" + m)
   }

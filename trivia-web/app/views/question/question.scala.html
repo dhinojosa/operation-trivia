@@ -1,0 +1,148 @@
+@import operation.trivia.entities.Question
+@(title: String, form: Form[Question], webJarAssets: WebJarAssets)(implicit messages: Messages)
+
+@import views.html.helper.FieldConstructor
+@implicitField = @{
+    FieldConstructor(field.f)
+}
+
+
+@template(title = "Operation Trivia", webJarAssets) {
+    <script type='text/javascript' src='@routes.WebJarAssets.at(webJarAssets.locate("rx.all.js"))'></script>
+    <script>
+            var hostSocket = new WebSocket("ws://localhost:9000/game/host/ws");
+            var scorekeeperSocket = new WebSocket("ws://localhost:9000/game/scorekeeper/ws");
+
+            function sendAnswer(answer) {
+                console.log("username is " + document.getElementById("login_name_only").textContent);
+                scorekeeperSocket.send(answer);
+                console.log(answer);
+            }
+
+            hostSocket.onmessage = function (event) {
+                var data = event.data;
+                console.log("Got Message:" + data);
+            };
+
+            hostSocket.onopen = function () {
+                hostSocket.send("init")
+            };
+
+
+            // an observer for when the socket is open
+            var openObserver = Rx.Observer.create(function (e) {
+                console.info('socket open');
+
+                // Now it is safe to send a message
+                socket.onNext('test');
+            });
+
+            // an observer for when the socket is about to close
+            var closingObserver = Rx.Observer.create(function () {
+                console.log('socket is about to close');
+            });
+
+            // create a web socket subject
+            socket = Rx.DOM.fromWebSocket(
+                    'ws://echo.websocket.org',
+                    null, // no protocol
+                    openObserver,
+                    closingObserver);
+
+            // subscribing creates the underlying socket and will emit a stream of incoming
+            // message events
+            socket.subscribe(
+                    function (e) {
+                        console.log('message: %s', e.data);
+                    },
+                    function (e) {
+                        // errors and "unclean" closes land here
+                        console.error('error: %s', e);
+                    },
+                    function () {
+                        // the socket has been closed
+                        console.info('socket closed');
+                    }
+            );
+
+
+            //                var openObserver = Rx.Observer.create(function(e) {
+            //                    console.info('socket open');
+            //
+            //                    // Now it is safe to send a message
+            //                    socket.onNext('test');
+            //                });
+            //
+            //                var closingObserver = Rx.Observer.create(function() {
+            //                    console.log('socket is about to close');
+            //                });
+            //
+            //                var socket = Rx.DOM.fromWebSocket(
+            //                        "ws://localhost:9000/game/host/ws",
+            //                        'what', // no protocol
+            //                        openObserver,
+            //                        closingObserver);
+            //
+            //                socket.subscribe(
+            //                        function(e) {
+            //                            console.log('message: %s', e.data);
+            //                        },
+            //                        function(e) {
+            //                            // errors and "unclean" closes land here
+            //                            console.error('error: %s', e);
+            //                        },
+            //                        function() {
+            //                            // the socket has been closed
+            //                            console.info('socket closed');
+            //                        }
+            //                );
+
+
+            //                function load() {
+            //                    source.subscribe(
+            //                            function (x) {
+            //                                console.log('onNext: ' + x)
+            //                            }, function (e) {
+            //                                console.log('onError: ' + e.message)
+            //                            }, function () {
+            //                                console.log('onCompleted')
+            //                            }
+            //                    );
+            //                }
+            //
+            //                window.onload = load
+    </script>
+    <div id="main">
+        <a href="@routes.LoginController.logout()">Logout</a>
+        @helper.form(action = routes.QuestionController.processQuestion(), 'id -> "question_form") {
+            @helper.inputText(form("item"),
+                '_id -> "question",
+                '_name -> "question",
+                '_label -> "Question:",
+                'size -> 40,
+                '_showConstraints -> false)
+
+            @helper.repeat(form("possibleAnswers"), min = 4) { answerField =>
+                @helper.inputText(answerField,
+                    '_label -> "Answer:",
+                    'size -> 40)
+            }
+
+            @helper.inputRadioGroup(
+                field = form("actualAnswer"),
+                options = Seq(
+                    "0" -> "Answer 1",
+                    "1" -> "Answer 2",
+                    "2" -> "Answer 3",
+                    "3" -> "Answer 4"),
+                '_label -> "Actual Answer:",
+                '_id -> "actualAnswer",
+                '_name -> "actualAnswer",
+                '_showConstraints -> false)
+
+
+            <input id="submit" name="submit" type="submit" value="Create"/>
+        }
+
+    </div>
+}
