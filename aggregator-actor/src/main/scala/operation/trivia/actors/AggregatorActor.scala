@@ -1,7 +1,7 @@
 package operation.trivia.actors
 
 import akka.actor.Actor
-import operation.trivia.entities.{Player, Reset}
+import operation.trivia.entities.Player
 
 import scala.collection.mutable.ArrayBuffer
 

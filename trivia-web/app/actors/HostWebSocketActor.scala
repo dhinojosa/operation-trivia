@@ -1,7 +1,7 @@
 package actors
 
 import akka.actor.{Actor, ActorRef, ActorSelection, Props}
-import operation.trivia.entities.{Question, Register, Unregister}
+import operation.trivia.entities._
 import play.api.Logger
 import play.api.libs.json._
 
@@ -25,11 +25,20 @@ class HostWebSocketActor(out: ActorRef) extends Actor {
       )
       out ! Json.stringify(json)
     case y: Int =>
-      Logger.debug("Got a message: {}" + y)
+      Logger.debug("Got an int message:" + y)
       out ! Json.stringify(Json.obj("secondsLeft" -> y))
     case None =>
       Logger.debug("There are no questions")
       out ! Json.stringify(Json.obj("error" -> "no questions"))
+    case RoundNext(n) =>
+      Logger.debug("Next Round:" + n)
+      out ! Json.stringify(Json.obj("round" -> Json.obj("status" -> "next", "number" -> n)))
+    case RoundStop =>
+      Logger.debug("Round Stop:")
+      out ! Json.stringify(Json.obj("round" -> Json.obj("status" -> "stop")))
+    case RoundStart =>
+      Logger.debug("Round Start:")
+      out ! Json.stringify(Json.obj("round" -> Json.obj("status" -> "start")))
     case m =>
       Logger.debug("Didn't find anything for" + m)
   }

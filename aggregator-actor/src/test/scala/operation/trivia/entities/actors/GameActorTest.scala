@@ -1,9 +1,6 @@
 package operation.trivia.entities.actors
 
-import akka.actor.ActorSystem
 import org.scalatest.{BeforeAndAfter, FunSuite, Matchers}
-import akka.testkit.TestActorRef
-import operation.trivia.entities.{Reset, Start}
 
 class GameActorTest extends FunSuite with Matchers with BeforeAndAfter {
 //  implicit val actorSystem = ActorSystem("SampleTest")

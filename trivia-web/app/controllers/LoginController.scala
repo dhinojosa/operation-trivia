@@ -3,7 +3,7 @@ package controllers
 import javax.inject._
 
 import akka.actor.{ActorSelection, ActorSystem}
-import operation.trivia.entities.{Player, Signoff, Signon}
+import operation.trivia.entities.{Player, SignOff, SignOn}
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -35,7 +35,7 @@ class LoginController @Inject()(val webJarAssets: WebJarAssets,
         BadRequest(views.html.login(formWithErrors, webJarAssets))
       },
       player => {
-        signonActor ! Signon(player)
+        signonActor ! SignOn(player)
         Redirect(routes.GameController.index()).withSession("name" -> player.name)
       }
     )
@@ -43,7 +43,7 @@ class LoginController @Inject()(val webJarAssets: WebJarAssets,
 
   def logout = Action { request =>
     request.session.get("name").foreach { name =>
-      signonActor ! Signoff(Player(name))
+      signonActor ! SignOff(Player(name))
     }
     Redirect(routes.LoginController.loginIntro()).withNewSession
   }

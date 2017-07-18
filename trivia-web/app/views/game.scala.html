@@ -51,9 +51,9 @@
                     .map(json => json['item'])
                     .subscribe(msg => {
                         console.log("Got question" + msg);
-                        $('#message_panel').html('');
-                        $('#question').html("<span class=\'question\'>" + msg + "</span>");
-                        $('#answers').show();
+                        $('#message_panel').fadeOut();
+                        $('#question').html("<span class=\'question\'>" + msg + "</span>").fadeIn();
+                        $('#answers').fadeIn();
                     });
 
             questionObservable
@@ -75,6 +75,39 @@
                         $('#seconds_left').html(msg);
                     });
 
+            //round
+            const roundObservable = jsonMessageObservable
+                    .filter(json => json['round'] !== undefined)
+                    .map(json => json['round']);
+
+            //round start
+            roundObservable
+                    .filter(roundJson => roundJson['status'] === 'start')
+                    .subscribe(msg => {
+                        console.log("Round Starts");
+                        $('#round_panel').html('Get Ready');
+                        $('#question_panel').fadeIn()
+                    });
+
+            //round stop
+            roundObservable
+                    .filter(roundJson => roundJson['status'] === 'stop')
+                    .subscribe(msg => {
+                        console.log("Round Ends");
+                        $('#round_panel').html('Round has ended, Chillax!');
+                        $('#question_panel').fadeOut()
+                    });
+
+            //next round
+            roundObservable
+                    .filter(roundJson => roundJson['status'] === 'next')
+                    .map(roundJson => roundJson['number'])
+                    .subscribe(msg => {
+                        console.log("Round number: " + msg);
+                        $('#round_panel').html('We are now in round:' + msg);
+                        $('#question_panel').fadeIn()
+                    });
+
             // Score Keeper Events
             const scoreKeeperOpenObservable = Rx.Observable.fromEvent(scoreKeeperSocket, 'open');
             scoreKeeperOpenObservable.subscribe(
@@ -92,43 +125,58 @@
                     () => console.log("Scorekeeper Messaging completed!")
             );
 
-            $(document).ready(function () {
-                $('#button_A').on('click', function (e) {
-                    const obj = {"name" : $('#login_name').val(), "answer" : 0};
-                    const jsonString = JSON.stringify(obj);
-                    console.log("Sending object: " + jsonString);
-                    scoreKeeperSocket.send(jsonString);
-                });
-            });
 
+            function sendAnswer(answer) {
+                const obj = {"name": $('#login_name').val(), "answer": answer};
+                const jsonString = JSON.stringify(obj);
+                console.log("Sending object: " + jsonString);
+                scoreKeeperSocket.send(jsonString);
+            }
+
+            //results
+            jsonMessageObservable
+                    .filter(json => json['round-results'] !== undefined)
+                    .doOnNext(json => console.log(json['round-results']))
+                    .subscribe(r => {
+                        $('#question_results_panel').html('The results for the last set of questions:' + msg);
+                    });
+
+            jsonMessageObservable
+                    .filter(json => json['question-results'] !== undefined)
+                    .doOnNext(json => console.log(json['question-results']))
+                    .subscribe(r => {
+                        $('#question_results_panel').html('The results for the last set of questions:' + msg);
+                    });
     </script>
     <div id="main">
         <a href="@routes.LoginController.logout()">Logout</a>
         <input type="hidden" id="login_name" value="@name">
         <div id="login_panel">@name</div>
-        <div id="round_panel"></div>
         <div id="message_panel"></div>
-        <div id="seconds_left"></div>
+        <div id="round_panel"></div>
         <div id="question_panel">
+            <div id="seconds_left"></div>
             <div id="question"></div>
             <div id="answers">
                 <div id="option_A">
-                    <button id="button_A">A</button>
+                    <button id="button_A" onclick="sendAnswer(0)">A</button>
                     <span></span>
                 </div>
                 <div id="option_B">
-                    <button id="button_B">B</button>
+                    <button id="button_B" onclick="sendAnswer(1)">B</button>
                     <span></span>
                 </div>
                 <div id="option_C">
-                    <button id="button_C">C</button>
+                    <button id="button_C" onclick="sendAnswer(2)">C</button>
                     <span></span>
                 </div>
                 <div id="option_D">
-                    <button id="button_D">D</button>
+                    <button id="button_D" onclick="sendAnswer(3)">D</button>
                     <span></span>
                 </div>
             </div>
         </div>
+        <div id="question_results_panel"></div>
+        <div id="round_results_panel"></div>
     </div>
 }

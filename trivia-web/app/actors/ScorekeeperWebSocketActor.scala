@@ -2,7 +2,7 @@ package actors
 
 import akka.actor.{Actor, ActorRef, ActorSelection, Props}
 import akka.event.Logging
-import operation.trivia.entities.{Answer, Player, Register, Unregister}
+import operation.trivia.entities._
 import play.api.Logger
 import play.api.libs.json._
 
@@ -17,21 +17,26 @@ class ScorekeeperWebSocketActor(out: ActorRef) extends Actor {
 
   def receive: PartialFunction[Any, Unit] = {
     case "init" =>
-      Logger.info("Scorekeeper init")
+      Logger.info("ScoreKeeperWebSocketActor Received: init")
       actorSelection ! Register(self)
-    //    //    case winners: (Int, List[(Player, (Int, Long))]) =>
-    //    //      out ! s"Round ${winners._1}\n" + winners._2
-    //    //        .zipWithIndex.map(f => (f._1, f._2 + 1)).map(f => s"${f._2}. ${f._1._1.name}")
     case s: String =>
-      Logger.info(s"Got answer from: $s")
+      //Answer arrived from the web
+      Logger.info(s"ScoreKeeperWebSocketActor Received String: $s")
       val json: JsValue = Json.parse(s)
       actorSelection ! Answer(Player((json \ "name").as[String]), (json \ "answer").as[Int])
+    case RoundResults(persons) =>
+      Logger.info(s"Round Results: $persons")
+      out ! Json.stringify(Json.obj("round-results" -> Json.toJson(persons.map(p => p.name))))
+    case QuestionResults(persons) =>
+      Logger.info(s"Question Results: $persons")
+      out ! Json.stringify(Json.obj("question-results" -> Json.toJson(persons.map(p => p.name))))
     case o =>
-      Logger.info(s"Got something else $o")
+      Logger.info(s"ScoreKeeperWebSocketActor Received Unknown: $o")
       unhandled(o)
   }
 
   override def postStop(): Unit = {
-    //    actorSelection ! Unregister(self)
+    Logger.info("Actor stopping")
+    actorSelection ! Unregister(self)
   }
 }

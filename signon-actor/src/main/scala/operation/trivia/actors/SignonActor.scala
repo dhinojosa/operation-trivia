@@ -21,20 +21,20 @@ class SignonActor extends Actor {
     context.system.actorSelection("akka.tcp://ActorSystem@127.0.0.1:2553/user/hostActor")
 
   override def receive: Receive = {
-    case Signon(p:Player) =>
+    case SignOn(p:Player) =>
       log.debug("Signing on player: {}", p)
       players += p
       if (players.nonEmpty) {
         log.debug("Single player signed on, starting game")
-        hostActorSelection ! Start
+        hostActorSelection ! GameStart
       }
-    case Signoff(p:Player) =>
+    case SignOff(p:Player) =>
       //No more players, stop the game
       log.debug("Signing off player: {}", p)
       players -= p
       if (players.isEmpty) {
         log.debug("No players signed on, stopping game")
-        hostActorSelection ! Stop
+        hostActorSelection ! GameStop
       }
   }
 }
