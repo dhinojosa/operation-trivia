@@ -71,7 +71,7 @@
                     .map(json => json['secondsLeft'])
                     .subscribe(msg => {
                         $('#message_panel').html('');
-                        $('#seconds_left').html(msg);
+                        $('#seconds_left').html(msg + ' seconds');
                     });
 
             //round
@@ -93,7 +93,7 @@
                     .filter(roundJson => roundJson['status'] === 'stop')
                     .subscribe(msg => {
                         console.log("Round Ends");
-                        $('#round_panel').html('Round has ended, Chillax!');
+                        $('#round_panel').html('Round has ended, Chillax for 5 minutes!');
                         $('#question_panel').fadeOut()
                     });
 
@@ -154,11 +154,13 @@
                     });
     </script>
     <div id="main">
-        <a href="@routes.LoginController.logout()">Logout</a>
         <input type="hidden" id="login_name" value="@name">
-        <div id="login_panel">@name</div>
+        <div id="login_panel"><span>Welcome: Get Ready to Play @name!</span></div>
+        <a href="@routes.LoginController.logout()">Logout</a>
+
         <div id="message_panel"></div>
         <div id="round_panel"></div>
+
         <div id="question_panel">
             <div id="seconds_left"></div>
             <div id="question"></div>
@@ -181,6 +183,7 @@
                 </div>
             </div>
         </div>
+
         <div id="question_results_panel"></div>
         <div id="round_results_panel"></div>
     </div>

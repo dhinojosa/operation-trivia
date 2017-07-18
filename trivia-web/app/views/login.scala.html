@@ -2,20 +2,31 @@
 @import play.api.i18n.Messages
 @(form: Form[Player], webJarAssets: WebJarAssets)(implicit messages: Messages)
 
-@form.globalError.map { error =>
-    <div>@error</div>
-}
-
-@template("Login to Continue", webJarAssets) {
-    @helper.form(action = routes.LoginController.login(), 'id -> "login_form") {
-        <div>
-        @helper.inputText(form("name"),
-                '_id -> "name",
-                '_name -> "name",
-                '_label -> "Name:",
-                '_showConstraints -> false)
-        </div>
-        <input id="submit" name="submit"
-               type="submit" value="Create"/>
+    @form.globalError.map { error =>
+        <div>@error</div>
     }
-}
+
+    @implicitFieldConstructor = @{
+        helper.FieldConstructor(field.f)
+    }
+
+    @template("Login to Continue", webJarAssets) {
+
+        <img id='tvguy' src="@routes.Assets.versioned("images/tvguy.jpg")" width="40%">
+
+
+        <div id="login-entry">
+        @helper.form(action = routes.LoginController.login(), 'id -> "login_form") {
+            <div>
+                <span id="login_instruction">Please Login with a name to get started</span>
+                @helper.inputText(form("name"),
+                    '_id -> "name",
+                    '_name -> "name",
+                    '_label -> "Name:",
+                    '_showConstraints -> false)
+            </div>
+            <input id="submit" name="submit"
+            type="submit" value="Create"/>
+        }
+        </div>
+    }

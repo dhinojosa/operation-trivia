@@ -1,0 +1,49 @@
+body {
+    background-color: #fffacd;
+}
+
+#tvguy {
+    display: block;
+    margin: 0 auto;
+    border: thin solid darkblue;
+}
+
+h1 {
+    font-family: 'Slackey', cursive;
+    text-align: center;
+    color: darkblue;
+}
+
+#login-entry {
+    margin-top: 50px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+#login_instruction {
+    font-family: 'Slackey', cursive;
+    color: darkblue;
+}
+#name {
+    margin-top: 10px;
+}
+
+#login_panel > span {
+    font-family: 'Slackey', cursive;
+    color: darkblue;
+}
+
+#question {
+    font-family: 'Slackey', cursive;
+    color: darkblue;
+    font-size: large;
+}
+
+
+#main {
+    position: relative;
+    margin:auto;
+}
+
+
