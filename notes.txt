@@ -1,0 +1,50 @@
+Each Person/Team can create and manipulate the actor/service that they are using 
+Manages Their Own Actor:
+
+Host Actor:
+  Purpose: Starts Game, Ends Games, Manages Rounds
+
+Aggregate Actor:
+  Purpose: Aggregate the scores
+
+Question Actor:
+  Purpose: Dispenses Questions
+
+Scorekeeper Actor:
+  Purpose: Manages Scores
+
+Signon Actor:
+  Purpose: Manages Signon
+
+Trivia-Web:
+  Purpose: Web Client, With
+
+TODO:
+  Talk about Actors and Akka
+  Talk about Play Framework
+  Talk about Timer
+  Assume everything will go down
+  Describe How to Run SBT:
+  Slides on Websocket on Play Framework
+  Better way to connect to each other
+  What happens if the actor is not there?
+  Same object (serialized ID)
+  Custom Codec/Serializer needed?
+  Definitely a better way to set actor address
+  Ad
+  Network Concerns/Router
+  Create Questions On Database!
+  run 9000!
+  better 404 message
+  Nice logout message
+  Make sure that log out will unregister a user.
+  Be able to change URL on the fly
+  round
+  A nice diagram would be nice
+  Increase connections
+  Create question-start, game-start, round-start elements
+  Delete Classes and Action and Actors not used
+  Create a blank project for people to use.
+
+
+

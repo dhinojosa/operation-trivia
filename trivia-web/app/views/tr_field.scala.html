@@ -1,0 +1,9 @@
+@(elements: helper.FieldElements)
+
+<tr class="field_tr @if(elements.hasErrors){field_div_error}">
+    <td><label for="@elements.id">@elements.label</label></td>
+    <td>
+        <div>@elements.input  <span class="error">@elements.errors.mkString(", ")</span></div>
+        <div class="field_help">@elements.infos.mkString(", ")</div>
+    </td>
+</tr>

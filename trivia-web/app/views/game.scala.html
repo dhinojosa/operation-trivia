@@ -70,7 +70,6 @@
                     .filter(json => json['secondsLeft'] !== undefined)
                     .map(json => json['secondsLeft'])
                     .subscribe(msg => {
-                        console.log("Got time" + msg);
                         $('#message_panel').html('');
                         $('#seconds_left').html(msg);
                     });
@@ -126,6 +125,8 @@
             );
 
 
+
+
             function sendAnswer(answer) {
                 const obj = {"name": $('#login_name').val(), "answer": answer};
                 const jsonString = JSON.stringify(obj);
@@ -133,19 +134,23 @@
                 scoreKeeperSocket.send(jsonString);
             }
 
+            const jsonScoreKeeperMessageObservable = scoreKeeperOnMessageObservable
+                    .map(e => e.data)
+                    .map(s => JSON.parse(s));
+
             //results
-            jsonMessageObservable
+            jsonScoreKeeperMessageObservable
                     .filter(json => json['round-results'] !== undefined)
                     .doOnNext(json => console.log(json['round-results']))
-                    .subscribe(r => {
-                        $('#question_results_panel').html('The results for the last set of questions:' + msg);
+                    .subscribe(json => {
+                        $('#round_results_panel').html('Congratulations to the following for winning the round:' + json['round-results']).fadeIn();
                     });
 
-            jsonMessageObservable
+            jsonScoreKeeperMessageObservable
                     .filter(json => json['question-results'] !== undefined)
-                    .doOnNext(json => console.log(json['question-results']))
-                    .subscribe(r => {
-                        $('#question_results_panel').html('The results for the last set of questions:' + msg);
+                    .doOnNext(json => console.log("question-results" + json['question-results']))
+                    .subscribe(json => {
+                        $('#question_results_panel').html('The results for the last set of questions:' + json['question-results']).fadeIn();
                     });
     </script>
     <div id="main">
